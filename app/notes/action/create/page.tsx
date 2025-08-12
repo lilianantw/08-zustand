@@ -15,11 +15,17 @@ export const metadata: Metadata = {
 };
 
 export default function CreateNotePage() {
+  // Function to handle closing the form
+  const handleClose = () => {
+    // Since this is a standalone page, we can redirect to the main notes page
+    window.location.href = "/notes";
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.container}>
         <h1 className={styles.title}>Create note</h1>
-        <NoteForm />
+        <NoteForm onClose={handleClose} />
       </div>
     </main>
   );
