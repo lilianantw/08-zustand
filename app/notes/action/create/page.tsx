@@ -1,31 +1,25 @@
-import { Metadata } from "next";
+import css from "./CreateNote.module.css";
 import NoteForm from "@/components/NoteForm/NoteForm";
-import styles from "./create.module.css";
 
-export const metadata: Metadata = {
-  title: "NoteHub - Create New Note",
-  description: "Create a new note in NoteHub to organize your tasks and ideas.",
+export const metadata = {
+  title: "Create New Note",
+  description:
+    "Create a new note and save it as a draft or publish immediately.",
   openGraph: {
-    title: "NoteHub - Create New Note",
+    title: "Create New Note",
     description:
-      "Create a new note in NoteHub to organize your tasks and ideas.",
-    url: "https://your-vercel-app.vercel.app/notes/action/create",
-    images: ["https://ac.goit.global/fullstack/react/notehub-og-meta.jpg"],
+      "Create a new note and save it as a draft or publish immediately.",
+    url: "/notes/action/create",
+    images: [{ url: "/og-create-note.png" }],
   },
 };
 
-export default function CreateNotePage() {
-  // Function to handle closing the form
-  const handleClose = () => {
-    // Since this is a standalone page, we can redirect to the main notes page
-    window.location.href = "/notes";
-  };
-
+export default function CreateNote() {
   return (
-    <main className={styles.main}>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Create note</h1>
-        <NoteForm onClose={handleClose} />
+    <main className={css.main}>
+      <div className={css.container}>
+        <h1 className={css.title}>Create note</h1>
+        <NoteForm />
       </div>
     </main>
   );
