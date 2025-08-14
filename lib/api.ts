@@ -1,3 +1,4 @@
+// lib/api.ts
 import axios from "axios";
 import type { Note, NoteTag, CreateNoteData } from "../types/note";
 
@@ -14,14 +15,26 @@ export interface CreateNotePayload {
   tag: NoteTag;
 }
 
+// Создаём экземпляр axios с базовым URL из .env
 const api = axios.create({
-  baseURL: "https://notehub-public.goit.study/api",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL || "https://notehub-public.goit.study/api",
   headers: {
-    Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN || ""}`, // Добавлен fallback на пустую строку
+    "Content-Type": "application/json",
   },
 });
 
-// Отримати всі нотатки (із пагінацією, пошуком і фільтрацією за тегом)
+// Добавляем интерцептор для авторизации
+api.interceptors.request.use((config) => {
+  const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Получить все заметки (с пагинацией, поиском и фильтром по тегу)
 export async function fetchNotes({
   page = 1,
   search = "",
@@ -32,11 +45,11 @@ export async function fetchNotes({
   tag?: string;
 }): Promise<FetchNotesResponse> {
   try {
-    const params: Record<string, string | number | undefined> = {
-      page,
-      search,
-    };
+    const params: Record<string, string | number | undefined> = { page };
 
+    if (search) {
+      params.search = search;
+    }
     if (tag && tag.toLowerCase() !== "all") {
       params.tag = tag;
     }
@@ -45,51 +58,55 @@ export async function fetchNotes({
     return response.data;
   } catch (error: unknown) {
     console.error("Error fetching notes:", error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to fetch notes: ${error.message}`);
-    }
-    throw new Error("Unknown error occurred while fetching notes");
+    throw new Error(
+      error instanceof Error
+        ? `Failed to fetch notes: ${error.message}`
+        : "Unknown error occurred while fetching notes"
+    );
   }
 }
 
-// Створити нову нотатку
+// Создать новую заметку
 export async function createNote(payload: CreateNoteData): Promise<Note> {
   try {
     const response = await api.post<Note>("/notes", payload);
     return response.data;
   } catch (error: unknown) {
     console.error("Error creating note:", error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to create note: ${error.message}`);
-    }
-    throw new Error("Unknown error occurred while creating note");
+    throw new Error(
+      error instanceof Error
+        ? `Failed to create note: ${error.message}`
+        : "Unknown error occurred while creating note"
+    );
   }
 }
 
-// Видалити нотатку за ID
+// Удалить заметку по ID
 export async function deleteNote(id: string): Promise<Note> {
   try {
     const response = await api.delete<Note>(`/notes/${id}`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error deleting note:", error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to delete note: ${error.message}`);
-    }
-    throw new Error("Unknown error occurred while deleting note");
+    throw new Error(
+      error instanceof Error
+        ? `Failed to delete note: ${error.message}`
+        : "Unknown error occurred while deleting note"
+    );
   }
 }
 
-// Отримати одну нотатку за ID
+// Получить заметку по ID
 export async function fetchNoteById(id: string): Promise<Note> {
   try {
     const response = await api.get<Note>(`/notes/${id}`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error fetching note by ID:", error);
-    if (error instanceof Error) {
-      throw new Error(`Failed to fetch note by ID: ${error.message}`);
-    }
-    throw new Error("Unknown error occurred while fetching note by ID");
+    throw new Error(
+      error instanceof Error
+        ? `Failed to fetch note by ID: ${error.message}`
+        : "Unknown error occurred while fetching note by ID"
+    );
   }
 }
