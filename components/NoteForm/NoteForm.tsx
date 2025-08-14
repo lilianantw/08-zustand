@@ -1,17 +1,26 @@
 "use client";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNoteStore } from "@/lib/store/noteStore";
+import { createNote } from "@/lib/api";
 import css from "./NoteForm.module.css";
 
 export default function NoteForm() {
   const { draft, setDraft, clearDraft } = useNoteStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  // Загрузка черновика при монтировании
-  useEffect(() => {
-    setDraft(draft);
-  }, []);
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      clearDraft();
+      router.back();
+    },
+    onError: (error) => {
+      console.error("Failed to create note:", error);
+    },
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -24,11 +33,11 @@ export default function NoteForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const action = formData.get("action");
-    // Логика отправки на сервер
-    clearDraft();
-    router.back();
+    mutation.mutate({
+      title: draft.title,
+      content: draft.content,
+      tag: draft.tag as "Todo" | "Work" | "Personal" | "Meeting" | "Shopping",
+    });
   };
 
   const handleCancel = () => {
@@ -70,8 +79,10 @@ export default function NoteForm() {
           onChange={handleChange}
         >
           <option value="Todo">Todo</option>
-          <option value="Idea">Idea</option>
-          <option value="Important">Important</option>
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Meeting">Meeting</option>
+          <option value="Shopping">Shopping</option>
         </select>
       </div>
       <div className={css.actions}>
@@ -82,21 +93,8 @@ export default function NoteForm() {
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          name="action"
-          value="draft"
-          className={css.submitButton}
-        >
-          Save as Draft
-        </button>
-        <button
-          type="submit"
-          name="action"
-          value="publish"
-          className={css.submitButton}
-        >
-          Publish
+        <button type="submit" className={css.submitButton}>
+          Create note
         </button>
       </div>
     </form>

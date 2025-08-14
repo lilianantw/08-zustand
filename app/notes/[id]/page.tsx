@@ -14,12 +14,9 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // получаем id из параметров
   const { id } = await params;
-  // получаем нотатку по id
   const note = await fetchNoteById(id);
 
-  // Если заметка не найдена возвращаем метаданные для страницы ошибки
   if (!note || !note.id) {
     return {
       title: "Note Not Found | NoteHub",
@@ -27,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: "Note Not Found | NoteHub",
         description: "The requested note could not be found on NoteHub.",
-        url: "https://07-routing-nextjs-pi-nine.vercel.app/notes",
+        url: "https://08-zustand-ten-lake.vercel.app/notes",
         siteName: "NoteHub",
         images: [
           {
@@ -42,7 +39,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // Формируем метаданные на основе заметки
   const pageTitle = `Note: ${note.title} | NoteHub`;
   const pageDescription =
     note.content.slice(0, 160) ||
@@ -54,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: pageTitle,
       description: pageDescription,
-      url: `https://07-routing-nextjs-pi-nine.vercel.app/notes/${id}`,
+      url: `https://08-zustand-ten-lake.vercel.app/notes/${id}`,
       siteName: "NoteHub",
       images: [
         {

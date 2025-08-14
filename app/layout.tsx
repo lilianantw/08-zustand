@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "NoteHub helps you create and organize notes by filtering by category. Quick search, clean design — ideal for work, study, and brainstorming.",
     siteName: "NoteHub",
-    url: "https://07-routing-nextjs-pi-nine.vercel.app",
+    url: "https://08-zustand-ten-lake.vercel.app",
     images: [
       {
         url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
